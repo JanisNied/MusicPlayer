@@ -1,0 +1,290 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
+
+* {
+    font-family: "Comfortaa", sans-serif;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: none;
+    text-decoration: none;
+    scroll-behavior: smooth;
+    transition: all 0.1s ease-in-out;
+    list-style-type: none;
+}
+
+:root {
+    --themeBackground: #eee;
+    --profileBackground: radial-gradient(circle, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 26%, rgba(0,212,255,1) 100%);
+    --mainColor: #526ceb;
+    --mainColorTransparent: #526ceb48;
+    --playlistBG: #fff;
+    --footerColor: #fff;
+}
+
+.titleColor1 {
+    color: var(--mainColor);
+}
+/* Flex Classes */
+.controlFlex {
+    gap: 2rem;
+}
+.playlist-flex {
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.direction-column {
+    flex-direction: column;
+}
+.main-flex {
+    gap: 4rem;
+}
+.flex {
+    display: flex;
+}
+.flex-shrink {
+    flex-shrink: 1;
+}
+.justify-start {
+    justify-content: flex-start;
+}
+.justify-between {
+    justify-content: space-between;
+}
+.justify-end {
+    justify-content: flex-start;
+}
+.justify-center {
+    justify-content: center;
+}
+.align-center {
+    align-items: center;
+}
+
+/* Special Elements */
+.profilePictureFrame {
+    height: 3rem;
+    width: 3rem;
+    background: var(--profileBackground);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.profilePicture {
+    height: 2.7rem;
+    width: 2.7rem;
+    border-radius: 50%;
+    background-image: url('/images/pfpplaceholder.png');
+    background-position: center center;
+    background-size: contain;
+}
+#searchField {
+    border-radius: 1rem;
+    padding: 0.5rem 0 0.5rem 2.2rem;
+    font-size: 1rem;
+    max-width: 95rem;
+}
+#searchBar {
+    width: 100%;
+    margin-left: 2rem;
+}
+#searchBar i {
+    display: inline;
+    position: relative;
+    left: 2rem;
+    top: .45rem;
+}
+
+
+/* Side navigator*/
+aside {
+    max-width: 13rem;
+    width: 100%;
+}
+.side-nav {
+    font-size: 1.2rem;
+}
+.side-nav li {
+    margin: 0.5rem 0 0.5rem;
+    padding: 1rem 1rem 1rem 1rem;
+    position: relative;
+}
+.side-nav li:hover {
+    color: var(--mainColor);
+    background-color: #ddd;
+    border-left: 0.3rem solid var(--mainColor);
+    border-radius: .4rem;
+    cursor: pointer;
+}
+.navSelected {
+    color: var(--mainColor);
+    background-color: #ddd;
+    border-left: 0.3rem solid var(--mainColor);
+    border-radius: .4rem;
+    cursor: pointer;
+}
+
+/*Main Player*/
+section {
+    min-width: 20rem;
+    max-width: 110rem;
+    width: 100%;
+    margin: 0 1rem;
+    height: 78vh;
+    padding: 1rem;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+#playlistContainer ul {
+    width: 100%;
+}
+#playlistContainer ul li {
+    margin-bottom: 1rem;
+    background: linear-gradient(180deg, rgba(255,255,255,1) 51%, var(--mainColorTransparent) 280%);
+    border-radius: 0.5rem;
+    padding: .4rem;
+}
+/* Music Control and info*/
+footer {
+    /* background: linear-gradient(-90deg, rgba(255,255,255,0.5) 51%, var(--mainColorTransparent) 100%); */
+    box-shadow: 0 0.5rem 2rem 0 rgba( 31, 38, 135, 0.37 );
+    backdrop-filter: blur( 0.34375rem );
+    -webkit-backdrop-filter: blur( 0.34375rem );
+    border: 0.0625rem solid rgba( 255, 255, 255, 0.18 );
+    min-height: 7rem;
+    width:100%;
+    background-color: var(--footerColor);
+}
+#songinfo {
+    padding: 1rem;
+}
+#songinfo h3 {
+    margin-bottom: 0.5rem;
+    display: inline;
+}
+#songinfo p {
+    display: inline;
+}
+#songinfo .img {
+    width: 10rem;
+    height: 10rem;
+    margin-top: -7rem;
+    margin-right: 1rem;
+    border-radius: 1rem;
+    filter: drop-shadow(0 0 0.75rem var(--mainColorTransparent));
+    background-image: url('/images/pfpplaceholder.png');
+    background-size: cover;
+    border: none;
+    background-position: center center;
+}
+#songinfo #heartSong {
+    background-color: rgba(0,0,0,0);
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+    border-radius: 50%;
+    width: 1.4rem;
+    height: 1.4rem;
+    margin-bottom: 0.4rem;
+}
+#songinfo #heartSong:hover {
+    color: var(--mainColor);
+}
+#musicControl {
+    padding: 0.5rem;
+}
+#controlPanel {
+    margin-bottom: 1.2rem;
+}
+#seekBar p {
+    font-size: 0.9rem;
+    display: inline;
+}
+#musicControl #playBtn {
+    width: 3rem;
+    height: 3rem;
+    font-size: 2.2rem;
+    border-radius: 50%;
+    background: linear-gradient(white, white) padding-box,
+              linear-gradient(318deg, var(--mainColor) 51%, rgb(159, 197, 231) 100%)border-box;
+    border: 0.2rem solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#playBtn:hover, #nextSong:hover, #prevSong:hover, #repeat:hover, #shuffle:hover {
+    color: var(--mainColor);
+}
+#nextSong, #prevSong, #repeat, #shuffle, #volume {
+    background-color: #ffffff00;
+    font-size: 1.5rem;
+    padding: 0.2rem;
+    border-radius: 50%;
+}
+#seekBar form input[type=range] {
+    width: 35rem;
+}
+#volume form input[type=range] {
+    width: 10rem;
+}
+#volume {
+    margin-right: 1rem;
+}  
+
+main {
+    flex-grow: 1
+}
+hr {
+    background-color: #ccc; 
+    width: 100% ;
+    height: 0.1rem;
+}
+.body {
+    background-color: var(--themeBackground);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+header {
+    padding: 1.5rem;
+    font-size: 1.5rem;
+}
+
+/* Others */ 
+.container {
+    margin: 0 auto;
+    max-width: 115rem;
+}
+
+/* Playlist */
+section h2 {
+    margin-bottom: 1rem;
+}
+.playlistElement {
+    background-color: var(--playlistBG);
+    border-radius: 1rem;
+    text-align: center;
+    max-width: 15rem;
+    min-width: 5rem;
+    width: 80%;
+    padding: 0.5rem;
+    background: linear-gradient(180deg, rgba(255,255,255,1) 51%, var(--mainColorTransparent) 280%);
+}
+.playlistElement img {
+    max-width: 15rem;
+    min-width: 5rem;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 1.5rem
+}
+.greeting {
+    font-size: 1rem;
+    width: 8.5rem;
+    text-align: right;
+    margin-right: 1rem;
+}
+@media (max-width: 1522px){
+    html {
+        font-size: 80%;
+    }
+}
