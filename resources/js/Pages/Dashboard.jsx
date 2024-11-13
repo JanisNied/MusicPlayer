@@ -1,7 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import SongUpload from '@/Components/SongUpload';
-import SongList from '@/Components/SongList';
 
 export default function Dashboard() {
     const { songs } = usePage().props;
