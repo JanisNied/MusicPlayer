@@ -13,7 +13,9 @@ class SongController extends Controller
     public function index()
     {
         $songs = Song::where('user_id', Auth::id())->get();
-        return Inertia::render('Songs/Index', ['songs' => $songs]);
+        $playlists = Auth::user()->playlists()->with('songs')->get();
+        
+        return Inertia::render('Songs/Index', ['songs' => $songs, 'playlists' => $playlists]);
     }
 
     public function create()

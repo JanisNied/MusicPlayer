@@ -22,7 +22,7 @@ export default function SongUpload({ onSuccess }) {
 
     return (
         <form onSubmit={handleSubmit} className="song-upload-form">
-            <div>
+            <div className='song-list-item' style={{animationDelay: "0.1s"}}>
                 <label>Title:</label>
                 <input
                     type="text"
@@ -31,7 +31,7 @@ export default function SongUpload({ onSuccess }) {
                     required
                 />
             </div>
-            <div>
+            <div className='song-list-item' style={{animationDelay: "0.12s"}}>
                 <label>Artist:</label>
                 <input
                     type="text"
@@ -40,7 +40,7 @@ export default function SongUpload({ onSuccess }) {
                     required
                 />
             </div>
-            <div>
+            <div className='song-list-item' style={{animationDelay: "0.14s"}}>
                 <label>Cover Image:</label>
                 <input
                     type="file"
@@ -48,7 +48,7 @@ export default function SongUpload({ onSuccess }) {
                     accept="image/*"
                 />
             </div>
-            <div>
+            <div className='song-list-item' style={{animationDelay: "0.16s"}}>
                 <label>Audio File:</label>
                 <input
                     type="file"
@@ -57,7 +57,7 @@ export default function SongUpload({ onSuccess }) {
                     required
                 />
             </div>
-            <div>
+            <div className='song-list-item' style={{animationDelay: "0.18s"}}>
                 <label>Genres (comma separated):</label>
                 <input
                     type="text"
@@ -65,8 +65,8 @@ export default function SongUpload({ onSuccess }) {
                     onChange={(e) => setData('genres', e.target.value.split(','))}
                 />
             </div>
-            <button type="submit">Upload Song</button>
-            {progress && <progress value={progress.percentage} max="100">{progress.percentage}%</progress>}
+            <button className='song-list-item' style={{animationDelay: "0.2s"}} type="submit">Upload Song</button>
+            {/* {progress && <progress value={progress.percentage} max="100">{progress.percentage}%</progress>} */}
         </form>
     );
 }

@@ -3,17 +3,21 @@ import { usePage } from "@inertiajs/react";
 import { useState, useRef, useEffect } from "react";
 import SongUpload from "@/Components/SongUpload";
 import Dropdown from "@/Components/Dropdown";
+import Playlists from "@/Components/Playlists";
+import PlaylistCreation from "@/Components/PlaylistCreation";
+import AddSongForm from "@/Components/AddSongToPlaylist";
 
 export default function Index() {
-    const { songs } = usePage().props;
+    const { songs, playlists } = usePage().props;
     const user = usePage().props.auth.user;
-
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const [currentSongId, setCurrentSongId] = useState(songs[0]?.id || null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [volume, setVolume] = useState(1);
     const [duration, setDuration] = useState(0);
     const audioRef = useRef(null);
+    
+    const currentSong = songs.find((song) => song.id === currentSongId) || {};
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -26,7 +30,7 @@ export default function Index() {
                 audio.removeEventListener("timeupdate", updateTime);
             };
         }
-    }, [currentIndex]);
+    }, [currentSongId]);
 
     const togglePlay = () => {
         const audio = audioRef.current;
@@ -45,25 +49,34 @@ export default function Index() {
     };
 
     const nextSong = () => {
+        const currentIndex = songs.findIndex(
+            (song) => song.id === currentSongId
+        );
         if (currentIndex < songs.length - 1) {
-            setCurrentIndex(currentIndex + 1);
+            setCurrentSongId(songs[currentIndex + 1].id);
         } else {
-            setCurrentIndex(0);
+            setCurrentSongId(songs[0].id);
         }
     };
+
     const previousSong = () => {
+        const currentIndex = songs.findIndex(
+            (song) => song.id === currentSongId
+        );
         if (currentIndex > 0) {
-            setCurrentIndex(currentIndex - 1);
+            setCurrentSongId(songs[currentIndex - 1].id);
         } else {
-            setCurrentIndex(songs.length - 1);
+            setCurrentSongId(songs[songs.length - 1].id);
         }
     };
+
     const handleLoadedMetadata = () => {
         const audio = audioRef.current;
         if (audio) {
             setDuration(audio.duration);
         }
     };
+
     const handleSeekChange = (e) => {
         const audio = audioRef.current;
         if (audio) {
@@ -71,6 +84,7 @@ export default function Index() {
             setCurrentTime(e.target.value);
         }
     };
+
     const handleVolumeChange = (e) => {
         const audio = audioRef.current;
         if (audio) {
@@ -78,7 +92,6 @@ export default function Index() {
             setVolume(e.target.value);
         }
     };
-    const currentSong = songs[currentIndex] || {};
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -90,17 +103,35 @@ export default function Index() {
                 .then(() => setIsPlaying(true))
                 .catch((error) => console.error("Error playing audio:", error));
         }
-    }, [currentIndex]);
+    }, [currentSongId]);
+
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${minutes}:${secs < 10 ? `0${secs}` : secs}`;
     };
+
     const [isStyleChanged, setIsStyleChanged] = useState(false);
 
     const handleClick = () => {
         setIsStyleChanged(!isStyleChanged);
     };
+    const [playlistMenu, setplaylistMenu] = useState(false);
+
+    const handlePlaylistMenu = () => {
+        setplaylistMenu(!playlistMenu);
+    };
+
+    const [isHome, setIsHome] = useState(true);
+    const homeToggle = (e, state) => {
+        setIsHome(state);
+    };
+
+    const [addSong, setAddSong] = useState(false);
+    const songToggle = () => {
+        setAddSong(!addSong);
+    };
+    
     return (
         <>
             <audio
@@ -128,11 +159,63 @@ export default function Index() {
             />
             <link rel="stylesheet" href="/css/mainstyle.css" />
             <div
-                className="uploadingSong"
+                className="uploadingSong song-list-item"
+                style={{ display: playlistMenu ? "flex" : "none" }}
+            >
+                <PlaylistCreation />
+                <button onClick={handlePlaylistMenu}>Exit</button>
+            </div>
+            <div
+                className="uploadingSong song-list-item"
                 style={{ display: isStyleChanged ? "flex" : "none" }}
             >
                 <SongUpload />
                 <button onClick={handleClick}>Exit</button>
+            </div>
+            <div className="uploadingSong song-list-item" style={{ display: addSong ? "flex" : "none" }}>
+                        <AddSongForm
+                            playlists={playlists}
+                            song={songs.find(
+                                (song) => song.id === currentSongId
+                            )}
+                            onAddSong={(playlistId, songId) =>
+                                axios
+                                    .post(
+                                        route("playlists.addSong", {
+                                            playlist: playlistId,
+                                        }),
+                                        { song_id: songId }
+                                    )
+                                    .then((response) => {
+                                        console.log(
+                                            "Song added successfully:",
+                                            response.data
+                                        );
+
+                                        setPlaylists((prevPlaylists) =>
+                                            prevPlaylists.map((playlist) =>
+                                                playlist.id === playlistId
+                                                    ? {
+                                                          ...playlist,
+                                                          songs: [
+                                                              ...playlist.songs,
+                                                              response.data
+                                                                  .song,
+                                                          ],
+                                                      }
+                                                    : playlist
+                                            )
+                                        );
+                                    })
+                                    .catch((error) => {
+                                        console.error(
+                                            "Error adding song:",
+                                            error.response?.data?.message
+                                        );
+                                    })
+                            }
+                        />
+                        <button onClick={songToggle}>Exit</button>
             </div>
             <div className="body">
                 <header>
@@ -181,58 +264,94 @@ export default function Index() {
                     <div className="container flex justify-between">
                         <aside>
                             <ul className="side-nav">
-                                <li>
-                                    <i className="fa-solid fa-music"></i> Home
+                                <li
+                                    id="songs-button"
+                                    className={isHome ? "navSelected" : ""}
+                                    onClick={(e) => {
+                                        homeToggle(e, true);
+                                    }}
+                                >
+                                    <i className="fa-solid fa-music"></i> All
+                                    Songs
                                 </li>
-                                <li className="navSelected">
-                                    <i className="ti ti-books"></i> My Library
+                                <li
+                                    className={isHome ? "" : "navSelected"}
+                                    id="playlists-button"
+                                    onClick={(e) => {
+                                        homeToggle(e, false);
+                                    }}
+                                >
+                                    <i className="ti ti-books"></i> Playlists
                                 </li>
                             </ul>
                             <hr />
                             <ul className="side-nav">
-                                <li>
+                                <li onClick={handlePlaylistMenu}>
                                     <i className="ti ti-circle-plus"></i> Create
                                     Playlist
                                 </li>
-                                <li>
-                                    <i className="ti ti-heart"></i> Liked Songs
-                                </li>
-                            </ul>
-                            <hr />
-                            <ul className="side-nav">
                                 <li onClick={handleClick}>
                                     <i className="ti ti-upload"></i> Upload Song
                                 </li>
                             </ul>
+                            <hr />
+                            <ul className="side-nav">
+                                <li>
+                                    <i className="ti ti-heart"></i> Liked Songs
+                                </li>
+                            </ul>
                             <div className="copyright" />
                         </aside>
-                        <section>
-                            <h2>Library</h2>
-                            <div
-                                className="flex playlist-flex"
-                                id="playlistContainer"
-                            >
+                        <section
+                            id="allSongs"
+                            style={
+                                isHome
+                                    ? { display: "none" }
+                                    : { display: "block" }
+                            }
+                        >
+                            <Playlists
+                                playlists={playlists}
+                                currentSongId={currentSongId}
+                                setCurrentSongId={setCurrentSongId}
+                            />
+                        </section>
+                        <section
+                            id="allSongs"
+                            style={
+                                isHome
+                                    ? { display: "block" }
+                                    : { display: "none" }
+                            }
+                        >
+                            <h2>All Songs</h2>
+                            <div className="flex playlist-flex playlistContainer">
                                 <ul>
                                     {songs.map((song, index) => (
                                         <li
                                             key={song.id}
                                             onClick={() =>
-                                                setCurrentIndex(index)
+                                                setCurrentSongId(song.id)
                                             }
+                                            className="song-list-item"
                                             style={{
                                                 cursor: "pointer",
                                                 fontWeight:
-                                                    currentIndex === index
+                                                    song.id === currentSongId
                                                         ? "bold"
                                                         : "normal",
                                                 backgroundColor:
-                                                    currentIndex === index
+                                                    song.id === currentSongId
                                                         ? "#f0f0f0"
                                                         : "transparent",
                                                 border:
-                                                    currentIndex === index
+                                                    song.id === currentSongId
                                                         ? "0.1rem solid var(--mainColor)"
                                                         : "none",
+                                                animationDelay: `${
+                                                    index * 0.03
+                                                }s`,
+                                                zIndex: "-100",
                                             }}
                                         >
                                             <div className="flex justify-between align-center">
@@ -268,7 +387,13 @@ export default function Index() {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div>
+                                                <div
+                                                    style={{
+                                                        textAlign: "right",
+                                                        display: "flex",
+                                                        columnGap: "1rem",
+                                                    }}
+                                                >
                                                     <p>
                                                         {new Date(
                                                             song.created_at
@@ -308,6 +433,9 @@ export default function Index() {
                                 <h3>{currentSong.title}</h3>
                                 <button id="heartSong">
                                     <i className="ti ti-heart"></i>
+                                </button>
+                                <button id="playlistSettings">
+                                <i className="fa-solid fa-plus" onClick={songToggle}></i>
                                 </button>
                             </div>
                             <p>{currentSong.artist}</p>

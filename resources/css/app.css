@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+    font-family: "Comfortaa", sans-serif;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: none;
+    text-decoration: none;
+    scroll-behavior: smooth;
+    transition: all 0.1s ease-in-out;
+    list-style-type: none;
+}
+
 :root {
     --themeBackground: #eee;
     --profileBackground: radial-gradient(circle, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 26%, rgba(0,212,255,1) 100%);
@@ -64,3 +77,51 @@
     display: flex;
     flex-direction: column;
 }
+.newPlaylistElement {
+    height: 6rem;
+}
+#playlistdata {
+   align-items: center;
+}
+#playlistHead {
+    background: 0;
+    font-size: large;
+    pointer-events: none;
+}
+#returnBtn {
+    display: inline;
+}
+#returnBtn:hover {
+    font-weight: bold;
+    color: var(--mainColor)
+}
+.playlistContainer ul li:hover {
+    transform: translateY(-0.1rem);
+    background: linear-gradient(180deg, var(--mainColor) 50%, var(--mainColorTransparent) 100%);
+    cursor: pointer;
+    color: white;
+    /* background-color: var(--mainColor); */
+    /* color:white; */
+}
+.button-custom {
+    color: #000 !important;
+}
+.playlistThingy:hover {
+    color: var(--mainColor);
+}
+.song-list-item {
+    opacity: 0;
+    transform: translateY(0.5rem);
+    animation: slideUp 0.5s forwards;
+  }
+  
+  @keyframes slideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
