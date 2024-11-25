@@ -21,9 +21,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/player/create', [SongController::class, 'create'])->name('songs.create');
     Route::post('/player', [SongController::class, 'store'])->name('songs.store');
 
-    Route::get('/player/{song}/edit', [SongController::class, 'edit'])->name('songs.edit');
+    // Route::get('/player/{song}/edit', [SongController::class, 'edit'])->name('songs.edit');
     Route::put('/player/{song}', [SongController::class, 'update'])->name('songs.update');
     Route::delete('/player/{song}', [SongController::class, 'destroy'])->name('songs.destroy');
+
+    Route::put('/player/playlists/{playlist}', [PlaylistController::class, 'update'])->name('playlists.update');
+    Route::delete('/player/playlists/{playlist}', [PlaylistController::class, 'destroy'])->name('playlists.destroy');
+    
     
     Route::get('/player/playlists', [PlaylistController::class, 'index'])->name('playlists.index');
     Route::post('/player/playlists', [PlaylistController::class, 'store'])->name('playlists.store');

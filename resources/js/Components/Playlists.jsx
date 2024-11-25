@@ -4,6 +4,7 @@ export default function Playlists({
     playlists,
     currentSongId,
     setCurrentSongId,
+    handleRightClick2
 }) {
     const [isPlaylist, setisPlaylist] = useState(false);
     const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
@@ -50,6 +51,7 @@ export default function Playlists({
                     {playlists.map((playlist, index) => (
                         <li
                             key={playlist.id}
+                            onContextMenu={(e) => handleRightClick2(e, playlist)}
                             className="newPlaylistElement song-list-item"
                             onClick={() => handlePlaylistClick(playlist.id)}
                             style={{
@@ -89,7 +91,7 @@ export default function Playlists({
                 </ul>
                 {selectedPlaylist && (
                     <ul style={{ display: isPlaylist ? "display" : "none" }}>
-                        <li className="newPlaylistElement" id="playlistHead">
+                        <li className="newPlaylistElement" id="playlistHead"> {/*onContextMenu={(e) => handleRightClick2(e, selectedPlaylist)} style={{cursor:"pointer"}} */}
                             {selectedPlaylist.image && (
                                 <div
                                     style={{

@@ -63,4 +63,54 @@ class PlaylistController extends Controller
         $song = Song::find($validated['song_id']);
         return redirect()->route('songs.index');
     }
+
+    public function destroy(Playlist $playlist)
+    {
+        if ($playlist->user_id !== Auth::id()) {
+            abort(403);
+        }
+        if ($playlist->image) {
+            Storage::disk('public')->delete($playlist->image);
+        }
+
+        $playlist->delete();
+
+        return redirect()->route('songs.index');
+    }
+    // public function edit(Playlist $playlist)
+    // {
+    //     if ($playlist->user_id !== Auth::id()) {
+    //         abort(403);
+    //     }
+
+    //     return Inertia::render('Songs/Edit', [
+    //         'playlist' => $playlist,
+    //     ]);
+    // }
+    public function update(Request $request, Playlist $playlist)
+{
+    if ($playlist->user_id !== Auth::id()) {
+        abort(403);
+    }
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'image' => 'nullable|image',
+    ]);
+
+    if ($request->file('image')) {
+        if ($playlist->image) {
+            Storage::disk('public')->delete($playlist->image);
+        }
+        $playlist->image = $request->file('image')->store('playlists', 'public');
+    }
+
+    $playlist->update([
+        'name' => $request->name,
+        'description' => $request->description,
+    ]);
+
+    return redirect()->route('songs.index');
+}
 }

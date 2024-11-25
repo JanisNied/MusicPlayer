@@ -48,16 +48,16 @@ class SongController extends Controller
 
         return redirect()->route('songs.index');
     }
-    public function edit(Song $song)
-    {
-        if ($song->user_id !== Auth::id()) {
-            abort(403);
-        }
+    // public function edit(Song $song)
+    // {
+    //     if ($song->user_id !== Auth::id()) {
+    //         abort(403);
+    //     }
 
-        return Inertia::render('Songs/Edit', [
-            'song' => $song,
-        ]);
-    }
+    //     return Inertia::render('Songs/Edit', [
+    //         'song' => $song,
+    //     ]);
+    // }
     public function update(Request $request, Song $song)
     {
         if ($song->user_id !== Auth::id()) {

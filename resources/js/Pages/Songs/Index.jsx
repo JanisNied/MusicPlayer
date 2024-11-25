@@ -11,6 +11,7 @@ import UpdatePasswordForm from "../Profile/Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "../Profile/Partials/UpdateProfileInformationForm";
 import SongEdit from "@/Components/SongEdit";
 import { Inertia } from "@inertiajs/inertia";
+import PlaylistEdit from "@/Components/PlaylistEdit";
 
 export default function Index({ mustVerifyEmail, status }) {
     const { songs, playlists } = usePage().props;
@@ -33,6 +34,13 @@ export default function Index({ mustVerifyEmail, status }) {
     const [contextMenu, setContextMenu] = useState({
         song: null,
     });
+
+    const [contextMenu2, setContextMenu2] = useState({
+        playlist: null,
+    });
+
+    const [playlistSettings, setplaylistSettings] = useState(false);
+
     const handleRightClick = (e, song) => {
         e.preventDefault();
         setContextMenu({
@@ -40,7 +48,19 @@ export default function Index({ mustVerifyEmail, status }) {
         });
         songToggle();
     };
+    const handleRightClick2 = (e, playlist) => {
+        e.preventDefault();
+        setContextMenu2({
+            playlist: playlist,
+        });
+        playlistSettingsToggle()
+        console.log(contextMenu2.playlist)
+    };
     const currentSong = songs.find((song) => song.id === currentSongId) || {};
+
+    const playlistSettingsToggle = () => {
+        setplaylistSettings(!playlistSettings);
+    };
     const toggleSettings = () => {
         setIsSettings(!isSettings);
     };
@@ -53,6 +73,14 @@ export default function Index({ mustVerifyEmail, status }) {
 
     const toggleLoop = () => {
         setIsLooping(!isLooping);
+    };
+    const handlePlaylistDelete = (playlistId) => {
+        if (confirm("Are you sure you want to delete this playlist?")) {
+            Inertia.delete(route("playlists.destroy", playlistId), {
+                onSuccess: () => {   
+                },
+            });
+        }
     };
     useEffect(() => {
         const audio = audioRef.current;
@@ -231,6 +259,18 @@ export default function Index({ mustVerifyEmail, status }) {
                 href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
             />
             <link rel="stylesheet" href="/css/mainstyle.css" />
+            <div
+                className="uploadingSong song-list-item"
+                style={{ display: playlistSettings ? "flex" : "none" }}
+            >
+                {contextMenu2.playlist && (
+                    <PlaylistEdit playlist={contextMenu2.playlist}/>
+                )}
+                <button onClick={() => handlePlaylistDelete(contextMenu2.playlist.id)}>
+                        Delete playlist
+                    </button>
+                <button onClick={playlistSettingsToggle}>Exit</button>
+            </div>
             <div
                 className="userSettings"
                 style={{ display: isSettings ? "flex" : "none" }}
@@ -414,6 +454,7 @@ export default function Index({ mustVerifyEmail, status }) {
                                 playlists={playlists}
                                 currentSongId={currentSongId}
                                 setCurrentSongId={setCurrentSongId}
+                                handleRightClick2={handleRightClick2}
                             />
                         </section>
                         <section
