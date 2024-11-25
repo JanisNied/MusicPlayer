@@ -9,9 +9,12 @@ import AddSongForm from "@/Components/AddSongToPlaylist";
 import DeleteUserForm from "../Profile/Partials/DeleteUserForm";
 import UpdatePasswordForm from "../Profile/Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "../Profile/Partials/UpdateProfileInformationForm";
+import SongEdit from "@/Components/SongEdit";
+import { Inertia } from "@inertiajs/inertia";
 
 export default function Index({ mustVerifyEmail, status }) {
     const { songs, playlists } = usePage().props;
+
     const user = usePage().props.auth.user;
     const [currentSongId, setCurrentSongId] = useState(songs[0]?.id || null);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -27,6 +30,16 @@ export default function Index({ mustVerifyEmail, status }) {
     const [isShuffle, setIsShuffle] = useState(false);
     const [isSettings, setIsSettings] = useState(false);
 
+    const [contextMenu, setContextMenu] = useState({
+        song: null,
+    });
+    const handleRightClick = (e, song) => {
+        e.preventDefault();
+        setContextMenu({
+            song: song,
+        });
+        songToggle();
+    };
     const currentSong = songs.find((song) => song.id === currentSongId) || {};
     const toggleSettings = () => {
         setIsSettings(!isSettings);
@@ -155,6 +168,19 @@ export default function Index({ mustVerifyEmail, status }) {
         const secs = Math.floor(seconds % 60);
         return `${minutes}:${secs < 10 ? `0${secs}` : secs}`;
     };
+    const handleDelete = (songId) => {
+        if (confirm("Are you sure you want to delete this song?")) {
+            Inertia.delete(route("songs.destroy", songId), {
+                preserveState: true,
+                onSuccess: () => {
+                    console.log("Song deleted successfully");
+                },
+                onError: (errors) => {
+                    console.error("Error deleting song:", errors);
+                },
+            });
+        }
+    };
 
     const [isStyleChanged, setIsStyleChanged] = useState(false);
 
@@ -205,20 +231,33 @@ export default function Index({ mustVerifyEmail, status }) {
                 href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
             />
             <link rel="stylesheet" href="/css/mainstyle.css" />
-            <div className="userSettings" style={{ display: (isSettings) ? "flex" : "none" }}>
+            <div
+                className="userSettings"
+                style={{ display: isSettings ? "flex" : "none" }}
+            >
                 <div className="py-12">
-                    <div style={{background:"#eee", maxHeight: "80rem", borderRadius: "0.5rem", padding: "1rem"}}>
-                    <UpdateProfileInformationForm
-                        mustVerifyEmail={mustVerifyEmail}
-                        status={status}
-                        className="max-w-xl song-list-item"
-                    />
-                    <hr />
-                    <UpdatePasswordForm className="max-w-xl song-list-item" />
-                    <hr />
-                    <DeleteUserForm className="max-w-xl song-list-item" />
+                    <div
+                        style={{
+                            background: "#eee",
+                            maxHeight: "80rem",
+                            borderRadius: "0.5rem",
+                            padding: "1rem",
+                        }}
+                    >
+                        <UpdateProfileInformationForm
+                            mustVerifyEmail={mustVerifyEmail}
+                            status={status}
+                            className="max-w-xl song-list-item"
+                        />
+                        <hr />
+                        <UpdatePasswordForm className="max-w-xl song-list-item" />
+                        <hr />
+                        <DeleteUserForm className="max-w-xl song-list-item" />
                     </div>
-                    <div className="exitBtn" style={{display:"flex", justifyContent:"center"}}>
+                    <div
+                        className="exitBtn"
+                        style={{ display: "flex", justifyContent: "center" }}
+                    >
                         <button onClick={toggleSettings}>Exit</button>
                     </div>
                 </div>
@@ -241,45 +280,29 @@ export default function Index({ mustVerifyEmail, status }) {
                 className="uploadingSong song-list-item"
                 style={{ display: addSong ? "flex" : "none" }}
             >
-                <AddSongForm
-                    playlists={playlists}
-                    song={songs.find((song) => song.id === currentSongId)}
-                    onAddSong={(playlistId, songId) =>
-                        axios
-                            .post(
-                                route("playlists.addSong", {
-                                    playlist: playlistId,
-                                }),
-                                { song_id: songId }
-                            )
-                            .then((response) => {
-                                console.log(
-                                    "Song added successfully:",
-                                    response.data
-                                );
-
-                                setPlaylists((prevPlaylists) =>
-                                    prevPlaylists.map((playlist) =>
-                                        playlist.id === playlistId
-                                            ? {
-                                                  ...playlist,
-                                                  songs: [
-                                                      ...playlist.songs,
-                                                      response.data.song,
-                                                  ],
-                                              }
-                                            : playlist
-                                    )
-                                );
-                            })
-                            .catch((error) => {
-                                console.error(
-                                    "Error adding song:",
-                                    error.response?.data?.message
-                                );
-                            })
-                    }
-                />
+                {contextMenu.song && (
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            rowGap: "1rem",
+                        }}
+                    >
+                        <AddSongForm
+                            playlists={playlists}
+                            song={songs.find(
+                                (song) => song.id === contextMenu.song.id
+                            )}
+                            
+                        />
+                        <SongEdit song={contextMenu.song} />
+                        <button
+                            onClick={() => handleDelete(contextMenu.song.id)}
+                        >
+                            Delete
+                        </button>
+                    </div>
+                )}
                 <button onClick={songToggle}>Exit</button>
             </div>
             <div className="body">
@@ -319,7 +342,11 @@ export default function Index({ mustVerifyEmail, status }) {
                                 </div>
                             </Dropdown.Trigger>
                             <Dropdown.Content>
-                                <div onClick={toggleSettings} className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none" style={{cursor:"pointer"}}>
+                                <div
+                                    onClick={toggleSettings}
+                                    className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                                    style={{ cursor: "pointer" }}
+                                >
                                     Profile
                                 </div>
                                 <Dropdown.Link
@@ -403,6 +430,9 @@ export default function Index({ mustVerifyEmail, status }) {
                                     {songs.map((song, index) => (
                                         <li
                                             key={song.id}
+                                            onContextMenu={(e) =>
+                                                handleRightClick(e, song)
+                                            }
                                             onClick={() =>
                                                 setCurrentSongId(song.id)
                                             }
@@ -490,7 +520,11 @@ export default function Index({ mustVerifyEmail, status }) {
                     </div>
                 </main>
                 <footer className="flex justify-between">
-                    <div id="songinfo" className="flex">
+                    <div
+                        id="songinfo"
+                        className="flex"
+                        onContextMenu={handleRightClick}
+                    >
                         <div id="imgthumbnail">
                             {currentSong.cover_image && (
                                 <div
@@ -506,12 +540,6 @@ export default function Index({ mustVerifyEmail, status }) {
                                 <h3>{currentSong.title}</h3>
                                 <button id="heartSong">
                                     <i className="ti ti-heart"></i>
-                                </button>
-                                <button id="playlistSettings">
-                                    <i
-                                        className="fa-solid fa-plus"
-                                        onClick={songToggle}
-                                    ></i>
                                 </button>
                             </div>
                             <p>{currentSong.artist}</p>

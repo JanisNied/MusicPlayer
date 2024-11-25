@@ -4,7 +4,7 @@ import { Inertia } from '@inertiajs/inertia';
 const AddSongToPlaylist = ({ playlists, song }) => {
     const [showPlaylists, setShowPlaylists] = useState(false);
 
-    const handleAddSong = async (playlistId) => {
+    const handleAddSong = (playlistId) => {
         try {
             Inertia.post(route("playlists.addSong", { playlist: playlistId }), {
                 song_id: song.id,
@@ -20,7 +20,7 @@ const AddSongToPlaylist = ({ playlists, song }) => {
 
     return (
         <>
-            <button onClick={() => setShowPlaylists(!showPlaylists)} className="button-custom">
+            <button onClick={() => setShowPlaylists(!showPlaylists)} className="button-custom song-list-item">
                 {showPlaylists ? "Hide Playlists" : "Add to Playlist"}
             </button>
             {showPlaylists && (

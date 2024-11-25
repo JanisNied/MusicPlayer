@@ -182,7 +182,7 @@ export default function Playlists({
                                         </div>
                                     </div>
                                     <div>
-                                        <p>
+                                        {/* <p>
                                             {new Date(
                                                 song.created_at
                                             ).toLocaleDateString("en-US", {
@@ -190,7 +190,7 @@ export default function Playlists({
                                                 month: "long",
                                                 day: "numeric",
                                             })}
-                                        </p>
+                                        </p> */}
                                     </div>
                                 </div>
                             </li>

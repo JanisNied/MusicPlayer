@@ -61,6 +61,6 @@ class PlaylistController extends Controller
         $playlist->songs()->attach($validated['song_id']);
 
         $song = Song::find($validated['song_id']);
-        return Redirect::route('songs.index');
+        return redirect()->route('songs.index');
     }
 }
