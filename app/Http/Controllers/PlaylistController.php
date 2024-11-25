@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Redirect;
 
 class PlaylistController extends Controller
 {
@@ -53,12 +55,12 @@ class PlaylistController extends Controller
         }
 
         if ($playlist->songs()->where('songs.id', $validated['song_id'])->exists()) {
-            redirect()->route('playlists.index');
+            Redirect::route('songs.index');
         }
         
         $playlist->songs()->attach($validated['song_id']);
 
         $song = Song::find($validated['song_id']);
-        return redirect()->route('songs.index');
+        return Redirect::route('songs.index');
     }
 }

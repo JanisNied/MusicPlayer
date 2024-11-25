@@ -6,8 +6,11 @@ import Dropdown from "@/Components/Dropdown";
 import Playlists from "@/Components/Playlists";
 import PlaylistCreation from "@/Components/PlaylistCreation";
 import AddSongForm from "@/Components/AddSongToPlaylist";
+import DeleteUserForm from "../Profile/Partials/DeleteUserForm";
+import UpdatePasswordForm from "../Profile/Partials/UpdatePasswordForm";
+import UpdateProfileInformationForm from "../Profile/Partials/UpdateProfileInformationForm";
 
-export default function Index() {
+export default function Index({ mustVerifyEmail, status }) {
     const { songs, playlists } = usePage().props;
     const user = usePage().props.auth.user;
     const [currentSongId, setCurrentSongId] = useState(songs[0]?.id || null);
@@ -22,8 +25,12 @@ export default function Index() {
     const audioRef = useRef(null);
     const [isLooping, setIsLooping] = useState(false);
     const [isShuffle, setIsShuffle] = useState(false);
+    const [isSettings, setIsSettings] = useState(false);
 
     const currentSong = songs.find((song) => song.id === currentSongId) || {};
+    const toggleSettings = () => {
+        setIsSettings(!isSettings);
+    };
     const toggleShuffle = () => {
         setIsShuffle(!isShuffle);
     };
@@ -72,28 +79,34 @@ export default function Index() {
         if (isShuffle) {
             let randomSongId;
             do {
-                randomSongId = songs[Math.floor(Math.random() * songs.length)].id;
-            } while (randomSongId === currentSongId); 
+                randomSongId =
+                    songs[Math.floor(Math.random() * songs.length)].id;
+            } while (randomSongId === currentSongId);
             setCurrentSongId(randomSongId);
         } else {
-            const currentIndex = songs.findIndex((song) => song.id === currentSongId);
+            const currentIndex = songs.findIndex(
+                (song) => song.id === currentSongId
+            );
             if (currentIndex < songs.length - 1) {
                 setCurrentSongId(songs[currentIndex + 1].id);
             } else {
-                setCurrentSongId(songs[0].id); 
+                setCurrentSongId(songs[0].id);
             }
         }
     };
-    
+
     const previousSong = () => {
         if (isShuffle) {
             let randomSongId;
             do {
-                randomSongId = songs[Math.floor(Math.random() * songs.length)].id;
-            } while (randomSongId === currentSongId); 
+                randomSongId =
+                    songs[Math.floor(Math.random() * songs.length)].id;
+            } while (randomSongId === currentSongId);
             setCurrentSongId(randomSongId);
         } else {
-            const currentIndex = songs.findIndex((song) => song.id === currentSongId);
+            const currentIndex = songs.findIndex(
+                (song) => song.id === currentSongId
+            );
             if (currentIndex > 0) {
                 setCurrentSongId(songs[currentIndex - 1].id);
             } else {
@@ -101,7 +114,6 @@ export default function Index() {
             }
         }
     };
-    
 
     const handleLoadedMetadata = () => {
         const audio = audioRef.current;
@@ -164,7 +176,7 @@ export default function Index() {
     const songToggle = () => {
         setAddSong(!addSong);
     };
-    
+
     return (
         <>
             <audio
@@ -193,6 +205,24 @@ export default function Index() {
                 href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
             />
             <link rel="stylesheet" href="/css/mainstyle.css" />
+            <div className="userSettings" style={{ display: (isSettings) ? "flex" : "none" }}>
+                <div className="py-12">
+                    <div style={{background:"#eee", maxHeight: "80rem", borderRadius: "0.5rem", padding: "1rem"}}>
+                    <UpdateProfileInformationForm
+                        mustVerifyEmail={mustVerifyEmail}
+                        status={status}
+                        className="max-w-xl song-list-item"
+                    />
+                    <hr />
+                    <UpdatePasswordForm className="max-w-xl song-list-item" />
+                    <hr />
+                    <DeleteUserForm className="max-w-xl song-list-item" />
+                    </div>
+                    <div className="exitBtn" style={{display:"flex", justifyContent:"center"}}>
+                        <button onClick={toggleSettings}>Exit</button>
+                    </div>
+                </div>
+            </div>
             <div
                 className="uploadingSong song-list-item"
                 style={{ display: playlistMenu ? "flex" : "none" }}
@@ -207,50 +237,50 @@ export default function Index() {
                 <SongUpload />
                 <button onClick={handleClick}>Exit</button>
             </div>
-            <div className="uploadingSong song-list-item" style={{ display: addSong ? "flex" : "none" }}>
-                        <AddSongForm
-                            playlists={playlists}
-                            song={songs.find(
-                                (song) => song.id === currentSongId
-                            )}
-                            onAddSong={(playlistId, songId) =>
-                                axios
-                                    .post(
-                                        route("playlists.addSong", {
-                                            playlist: playlistId,
-                                        }),
-                                        { song_id: songId }
-                                    )
-                                    .then((response) => {
-                                        console.log(
-                                            "Song added successfully:",
-                                            response.data
-                                        );
+            <div
+                className="uploadingSong song-list-item"
+                style={{ display: addSong ? "flex" : "none" }}
+            >
+                <AddSongForm
+                    playlists={playlists}
+                    song={songs.find((song) => song.id === currentSongId)}
+                    onAddSong={(playlistId, songId) =>
+                        axios
+                            .post(
+                                route("playlists.addSong", {
+                                    playlist: playlistId,
+                                }),
+                                { song_id: songId }
+                            )
+                            .then((response) => {
+                                console.log(
+                                    "Song added successfully:",
+                                    response.data
+                                );
 
-                                        setPlaylists((prevPlaylists) =>
-                                            prevPlaylists.map((playlist) =>
-                                                playlist.id === playlistId
-                                                    ? {
-                                                          ...playlist,
-                                                          songs: [
-                                                              ...playlist.songs,
-                                                              response.data
-                                                                  .song,
-                                                          ],
-                                                      }
-                                                    : playlist
-                                            )
-                                        );
-                                    })
-                                    .catch((error) => {
-                                        console.error(
-                                            "Error adding song:",
-                                            error.response?.data?.message
-                                        );
-                                    })
-                            }
-                        />
-                        <button onClick={songToggle}>Exit</button>
+                                setPlaylists((prevPlaylists) =>
+                                    prevPlaylists.map((playlist) =>
+                                        playlist.id === playlistId
+                                            ? {
+                                                  ...playlist,
+                                                  songs: [
+                                                      ...playlist.songs,
+                                                      response.data.song,
+                                                  ],
+                                              }
+                                            : playlist
+                                    )
+                                );
+                            })
+                            .catch((error) => {
+                                console.error(
+                                    "Error adding song:",
+                                    error.response?.data?.message
+                                );
+                            })
+                    }
+                />
+                <button onClick={songToggle}>Exit</button>
             </div>
             <div className="body">
                 <header>
@@ -274,16 +304,24 @@ export default function Index() {
                                     className="flex justify-end align-center"
                                     style={{ cursor: "pointer" }}
                                 >
-                                    <p className="greeting" style={{overflow:"hidden", textOverflow:"ellipsis"}}>{user.name}</p>
+                                    <p
+                                        className="greeting"
+                                        style={{
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                        }}
+                                    >
+                                        {user.name}
+                                    </p>
                                     <div className="profilePictureFrame">
                                         <div className="profilePicture"></div>
                                     </div>
                                 </div>
                             </Dropdown.Trigger>
                             <Dropdown.Content>
-                                <Dropdown.Link href={route("profile.edit")}>
+                                <div onClick={toggleSettings} className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none" style={{cursor:"pointer"}}>
                                     Profile
-                                </Dropdown.Link>
+                                </div>
                                 <Dropdown.Link
                                     href={route("logout")}
                                     method="post"
@@ -470,7 +508,10 @@ export default function Index() {
                                     <i className="ti ti-heart"></i>
                                 </button>
                                 <button id="playlistSettings">
-                                <i className="fa-solid fa-plus" onClick={songToggle}></i>
+                                    <i
+                                        className="fa-solid fa-plus"
+                                        onClick={songToggle}
+                                    ></i>
                                 </button>
                             </div>
                             <p>{currentSong.artist}</p>
@@ -481,7 +522,13 @@ export default function Index() {
                         className="flex align-center direction-column"
                     >
                         <div id="controlPanel" className="flex controlFlex">
-                            <button id="shuffle" onClick={toggleShuffle} style={{color: (isShuffle) ? "var(--mainColor)" : ""}}>
+                            <button
+                                id="shuffle"
+                                onClick={toggleShuffle}
+                                style={{
+                                    color: isShuffle ? "var(--mainColor)" : "",
+                                }}
+                            >
                                 <i className="ti ti-arrows-shuffle"></i>
                             </button>
                             <button id="prevSong" onClick={previousSong}>
@@ -499,7 +546,13 @@ export default function Index() {
                             <button id="nextSong" onClick={nextSong}>
                                 <i className="ti ti-player-track-next"></i>
                             </button>
-                            <button id="repeat" onClick={toggleLoop} style={{color: (isLooping) ? "var(--mainColor)" : ""}}>
+                            <button
+                                id="repeat"
+                                onClick={toggleLoop}
+                                style={{
+                                    color: isLooping ? "var(--mainColor)" : "",
+                                }}
+                            >
                                 <i className="ti ti-repeat"></i>
                             </button>
                         </div>
@@ -534,7 +587,13 @@ export default function Index() {
                     <div id="volume">
                         <form className="flex align-center">
                             <div id="volume" onClick={toggleMute}>
-                                <i className={isMuted ? "ti ti-volume-3" : "ti ti-volume"}></i>
+                                <i
+                                    className={
+                                        isMuted
+                                            ? "ti ti-volume-3"
+                                            : "ti ti-volume"
+                                    }
+                                ></i>
                             </div>
                             <input
                                 type="range"

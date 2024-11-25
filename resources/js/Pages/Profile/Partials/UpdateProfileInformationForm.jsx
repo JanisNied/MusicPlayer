@@ -25,7 +25,7 @@ export default function UpdateProfileInformation({
     };
 
     return (
-        <section className={className}>
+        <section className={className} style={{height:"25rem"}}>
             <header>
                 <h2 className="text-lg font-medium text-gray-900">
                     Profile Information
