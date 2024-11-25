@@ -30,6 +30,7 @@ export default function Index({ mustVerifyEmail, status }) {
     const [isLooping, setIsLooping] = useState(false);
     const [isShuffle, setIsShuffle] = useState(false);
     const [isSettings, setIsSettings] = useState(false);
+    const [playlistContext, setPlaylistContext] = useState(false);
 
     const [contextMenu, setContextMenu] = useState({
         song: null,
@@ -39,8 +40,36 @@ export default function Index({ mustVerifyEmail, status }) {
         playlist: null,
     });
 
-    const [playlistSettings, setplaylistSettings] = useState(false);
+    const [contextMenu3, setContextMenu3] = useState({
+        song: null,
+        playlist: null,
+    });
 
+    const [playlistSettings, setplaylistSettings] = useState(false);
+    const togglePlaylistContext = () => {
+        setPlaylistContext(!playlistContext);
+    }
+    const handlePlaylistSongRemove = (songId, playlist) => {
+        if (confirm('Are you sure you want to remove this song from the playlist?')) {
+            Inertia.delete(route('playlists.removeSong', { playlist: playlist.id }), {
+                data: { song_id: songId },
+                onSuccess: () => {
+
+                },
+                onError: (error) => {
+                    console.error('Error removing song from playlist:', error);
+                }
+            });
+        }
+    }
+    const handlePlaylistRightClick = (e, song, playlist) => {
+        e.preventDefault();
+        setContextMenu3({
+            song: song,
+            playlist: playlist
+        });
+        togglePlaylistContext();
+    };
     const handleRightClick = (e, song) => {
         e.preventDefault();
         setContextMenu({
@@ -54,7 +83,6 @@ export default function Index({ mustVerifyEmail, status }) {
             playlist: playlist,
         });
         playlistSettingsToggle()
-        console.log(contextMenu2.playlist)
     };
     const currentSong = songs.find((song) => song.id === currentSongId) || {};
 
@@ -261,6 +289,28 @@ export default function Index({ mustVerifyEmail, status }) {
             <link rel="stylesheet" href="/css/mainstyle.css" />
             <div
                 className="uploadingSong song-list-item"
+                style={{ display: playlistContext ? "flex" : "none" }}
+            >
+                {contextMenu3.song && (
+                    <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        rowGap: "1rem",
+                    }}
+                >
+                    <SongEdit song={contextMenu3.song} />
+                    <button
+                        onClick={() => handlePlaylistSongRemove(contextMenu3.song.id, contextMenu3.playlist)}
+                    >
+                        Delete
+                    </button>
+                </div>
+                )}
+                <button onClick={togglePlaylistContext}>Exit</button>
+                </div>
+            <div
+                className="uploadingSong song-list-item"
                 style={{ display: playlistSettings ? "flex" : "none" }}
             >
                 {contextMenu2.playlist && (
@@ -455,6 +505,7 @@ export default function Index({ mustVerifyEmail, status }) {
                                 currentSongId={currentSongId}
                                 setCurrentSongId={setCurrentSongId}
                                 handleRightClick2={handleRightClick2}
+                                handlePlaylistRightClick={handlePlaylistRightClick}
                             />
                         </section>
                         <section

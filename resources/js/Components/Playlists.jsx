@@ -4,7 +4,8 @@ export default function Playlists({
     playlists,
     currentSongId,
     setCurrentSongId,
-    handleRightClick2
+    handleRightClick2,
+    handlePlaylistRightClick
 }) {
     const [isPlaylist, setisPlaylist] = useState(false);
     const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
@@ -138,6 +139,7 @@ export default function Playlists({
                             <li
                                 key={song.id}
                                 onClick={() => handleSongClick(song.id)}
+                                onContextMenu={(e) => handlePlaylistRightClick(e, song, selectedPlaylist)}
                                 className="song-list-item"
                                 style={{
                                     cursor: "pointer",

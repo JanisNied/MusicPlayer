@@ -32,6 +32,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/player/playlists', [PlaylistController::class, 'index'])->name('playlists.index');
     Route::post('/player/playlists', [PlaylistController::class, 'store'])->name('playlists.store');
     Route::post('/player/playlists/{playlist}/add-song', [PlaylistController::class, 'addSong'])->name('playlists.addSong');
+    Route::delete('/player/playlists/{playlist}/remove-song', [PlaylistController::class, 'removeSong'])->name('playlists.removeSong');
+
 });
 
 Route::middleware('auth')->group(function () {

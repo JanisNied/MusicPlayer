@@ -63,7 +63,19 @@ class PlaylistController extends Controller
         $song = Song::find($validated['song_id']);
         return redirect()->route('songs.index');
     }
-
+    public function removeSong(Request $request, Playlist $playlist)
+    {
+        $validated = $request->validate([
+            'song_id' => 'required|exists:songs,id',
+        ]);
+        if ($playlist->user_id !== Auth::id()) {
+            abort(403);
+        }
+        $playlist->songs()->detach($validated['song_id']);
+    
+        return redirect()->route('songs.index')->with('success', 'Song removed from playlist.');
+    }
+    
     public function destroy(Playlist $playlist)
     {
         if ($playlist->user_id !== Auth::id()) {
@@ -77,16 +89,7 @@ class PlaylistController extends Controller
 
         return redirect()->route('songs.index');
     }
-    // public function edit(Playlist $playlist)
-    // {
-    //     if ($playlist->user_id !== Auth::id()) {
-    //         abort(403);
-    //     }
 
-    //     return Inertia::render('Songs/Edit', [
-    //         'playlist' => $playlist,
-    //     ]);
-    // }
     public function update(Request $request, Playlist $playlist)
 {
     if ($playlist->user_id !== Auth::id()) {
