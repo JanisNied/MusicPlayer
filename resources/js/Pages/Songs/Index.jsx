@@ -40,6 +40,7 @@ export default function Index() {
         if (audio) {
             const updateTime = () => setCurrentTime(audio.currentTime);
             audio.addEventListener("timeupdate", updateTime);
+            audio.volume = volume;
 
             return () => {
                 audio.removeEventListener("timeupdate", updateTime);
@@ -273,7 +274,7 @@ export default function Index() {
                                     className="flex justify-end align-center"
                                     style={{ cursor: "pointer" }}
                                 >
-                                    <p className="greeting">{user.name}</p>
+                                    <p className="greeting" style={{overflow:"hidden", textOverflow:"ellipsis"}}>{user.name}</p>
                                     <div className="profilePictureFrame">
                                         <div className="profilePicture"></div>
                                     </div>
