@@ -12,13 +12,28 @@ export default function Index() {
     const user = usePage().props.auth.user;
     const [currentSongId, setCurrentSongId] = useState(songs[0]?.id || null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isMuted, setisMuted] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
-    const [volume, setVolume] = useState(1);
+    const [volume, setVolume] = useState(() => {
+        const savedVolume = localStorage.getItem("janisprojectvolume");
+        return savedVolume !== null ? parseFloat(savedVolume) : 1;
+    });
     const [duration, setDuration] = useState(0);
     const audioRef = useRef(null);
-    
-    const currentSong = songs.find((song) => song.id === currentSongId) || {};
+    const [isLooping, setIsLooping] = useState(false);
+    const [isShuffle, setIsShuffle] = useState(false);
 
+    const currentSong = songs.find((song) => song.id === currentSongId) || {};
+    const toggleShuffle = () => {
+        setIsShuffle(!isShuffle);
+    };
+    const toggleMute = () => {
+        setisMuted(!isMuted);
+    };
+
+    const toggleLoop = () => {
+        setIsLooping(!isLooping);
+    };
     useEffect(() => {
         const audio = audioRef.current;
 
@@ -31,6 +46,10 @@ export default function Index() {
             };
         }
     }, [currentSongId]);
+
+    useEffect(() => {
+        localStorage.setItem("janisprojectvolume", volume);
+    }, [volume]);
 
     const togglePlay = () => {
         const audio = audioRef.current;
@@ -49,26 +68,39 @@ export default function Index() {
     };
 
     const nextSong = () => {
-        const currentIndex = songs.findIndex(
-            (song) => song.id === currentSongId
-        );
-        if (currentIndex < songs.length - 1) {
-            setCurrentSongId(songs[currentIndex + 1].id);
+        if (isShuffle) {
+            let randomSongId;
+            do {
+                randomSongId = songs[Math.floor(Math.random() * songs.length)].id;
+            } while (randomSongId === currentSongId); 
+            setCurrentSongId(randomSongId);
         } else {
-            setCurrentSongId(songs[0].id);
+            const currentIndex = songs.findIndex((song) => song.id === currentSongId);
+            if (currentIndex < songs.length - 1) {
+                setCurrentSongId(songs[currentIndex + 1].id);
+            } else {
+                setCurrentSongId(songs[0].id); 
+            }
         }
     };
-
+    
     const previousSong = () => {
-        const currentIndex = songs.findIndex(
-            (song) => song.id === currentSongId
-        );
-        if (currentIndex > 0) {
-            setCurrentSongId(songs[currentIndex - 1].id);
+        if (isShuffle) {
+            let randomSongId;
+            do {
+                randomSongId = songs[Math.floor(Math.random() * songs.length)].id;
+            } while (randomSongId === currentSongId); 
+            setCurrentSongId(randomSongId);
         } else {
-            setCurrentSongId(songs[songs.length - 1].id);
+            const currentIndex = songs.findIndex((song) => song.id === currentSongId);
+            if (currentIndex > 0) {
+                setCurrentSongId(songs[currentIndex - 1].id);
+            } else {
+                setCurrentSongId(songs[songs.length - 1].id);
+            }
         }
     };
+    
 
     const handleLoadedMetadata = () => {
         const audio = audioRef.current;
@@ -141,6 +173,8 @@ export default function Index() {
                 preload="auto"
                 hidden={!currentSong.file}
                 onLoadedMetadata={handleLoadedMetadata}
+                loop={isLooping}
+                muted={isMuted}
             />
 
             <meta charSet="UTF-8" />
@@ -446,7 +480,7 @@ export default function Index() {
                         className="flex align-center direction-column"
                     >
                         <div id="controlPanel" className="flex controlFlex">
-                            <button id="shuffle">
+                            <button id="shuffle" onClick={toggleShuffle} style={{color: (isShuffle) ? "var(--mainColor)" : ""}}>
                                 <i className="ti ti-arrows-shuffle"></i>
                             </button>
                             <button id="prevSong" onClick={previousSong}>
@@ -464,7 +498,7 @@ export default function Index() {
                             <button id="nextSong" onClick={nextSong}>
                                 <i className="ti ti-player-track-next"></i>
                             </button>
-                            <button id="repeat">
+                            <button id="repeat" onClick={toggleLoop} style={{color: (isLooping) ? "var(--mainColor)" : ""}}>
                                 <i className="ti ti-repeat"></i>
                             </button>
                         </div>
@@ -498,9 +532,9 @@ export default function Index() {
                     </div>
                     <div id="volume">
                         <form className="flex align-center">
-                            <button id="volume">
-                                <i className="ti ti-volume"></i>
-                            </button>
+                            <div id="volume" onClick={toggleMute}>
+                                <i className={isMuted ? "ti ti-volume-3" : "ti ti-volume"}></i>
+                            </div>
                             <input
                                 type="range"
                                 min="0"
