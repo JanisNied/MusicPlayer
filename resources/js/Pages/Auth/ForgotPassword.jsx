@@ -40,6 +40,7 @@ export default function ForgotPassword({ status }) {
                     className="mt-1 block w-full"
                     isFocused={true}
                     onChange={(e) => setData('email', e.target.value)}
+                    style={{border: "0.1rem solid black", borderRadius: "0.5rem"}}
                 />
 
                 <InputError message={errors.email} className="mt-2" />

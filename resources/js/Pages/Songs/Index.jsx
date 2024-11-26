@@ -397,10 +397,11 @@ export default function Index({ mustVerifyEmail, status }) {
             </div>
             <div className="body">
                 <header>
-                    <div className="container flex justify-between align-center flex-shrink">
-                        <p>
-                            <span className="titleColor1">Music</span>Player
-                        </p>
+                    <div className="container flex justify-between flex-shrink"style={{alignItems: "flex-start"}}>
+                        <div style={{display: "flex", flexDirection: "column"}}>
+                            <p><span className="titleColor1">Music</span>Player</p>
+                            <p><span style={{fontSize: ".6rem", position: "relative", top:"-1rem"}}>Powered by Coffee - literally.</span></p>
+                        </div>
                         <form action="#" id="searchBar" className="flex">
                             <i className="ti ti-search"></i>
                             <input

@@ -39,6 +39,7 @@ export default function ConfirmPassword() {
                         className="mt-1 block w-full"
                         isFocused={true}
                         onChange={(e) => setData('password', e.target.value)}
+                        style={{border: "0.1rem solid black", borderRadius: "0.5rem"}}
                     />
 
                     <InputError message={errors.password} className="mt-2" />

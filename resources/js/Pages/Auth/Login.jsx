@@ -5,6 +5,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import Logo from '@/Components/ApplicationLogo';
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -24,7 +25,7 @@ export default function Login({ status, canResetPassword }) {
     return (
         <GuestLayout>
             <Head title="Log in" />
-
+            
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
                     {status}
@@ -44,6 +45,7 @@ export default function Login({ status, canResetPassword }) {
                         autoComplete="username"
                         isFocused={true}
                         onChange={(e) => setData('email', e.target.value)}
+                        style={{border: "0.1rem solid black", borderRadius: "0.5rem"}}
                     />
 
                     <InputError message={errors.email} className="mt-2" />
@@ -60,6 +62,7 @@ export default function Login({ status, canResetPassword }) {
                         className="mt-1 block w-full"
                         autoComplete="current-password"
                         onChange={(e) => setData('password', e.target.value)}
+                        style={{border: "0.1rem solid black", borderRadius: "0.5rem"}}
                     />
 
                     <InputError message={errors.password} className="mt-2" />
@@ -73,6 +76,7 @@ export default function Login({ status, canResetPassword }) {
                             onChange={(e) =>
                                 setData('remember', e.target.checked)
                             }
+                            style={{border: "0.1rem solid black", borderRadius: "0.5rem"}}
                         />
                         <span className="ms-2 text-sm text-gray-600">
                             Remember me
@@ -82,14 +86,14 @@ export default function Login({ status, canResetPassword }) {
 
                 <div className="mt-4 flex items-center space-between flex-gap">
                     <div className="registration-div">
-                        {canResetPassword && (
+                        {/* {canResetPassword && (
                             <Link
                                 href={route('password.request')}
                                 className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                             >
                                 Forgot your password?
                             </Link>
-                        )}
+                        )} */}
                         <Link
                             href={route('register')}
                             className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
